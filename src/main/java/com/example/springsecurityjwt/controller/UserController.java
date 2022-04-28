@@ -8,10 +8,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Collection;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping(UserController.BASE_URL)
 public class UserController {
 
     private UserService userService;
+    public static final String BASE_URL = "/api/v1/user";
 
     private PasswordEncoder passwordEncoder;
 
