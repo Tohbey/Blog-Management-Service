@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(AuthenticationController.BASE_URL)
 public class AuthenticationController {
-    public static final String BASE_URL= "api/v1/auth";
+    public static final String BASE_URL= "/api/v1/auth";
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -30,13 +30,13 @@ public class AuthenticationController {
     @Autowired
     private CustomDetailService userDetailsService;
 
-    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) throws Exception {
 
-        authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
+        authenticate(authenticationRequest.getEmail(), authenticationRequest.getPassword());
 
         final CustomDetail userDetails = userDetailsService
-                .loadUserByUsername(authenticationRequest.getUsername());
+                .loadUserByUsername(authenticationRequest.getEmail());
 
         final String token = jwtTokenUtil.generateToken(userDetails);
 
