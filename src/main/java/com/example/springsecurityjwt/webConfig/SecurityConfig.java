@@ -1,5 +1,7 @@
 package com.example.springsecurityjwt.webConfig;
 
+import com.example.springsecurityjwt.controller.AuthenticationController;
+import com.example.springsecurityjwt.controller.UserController;
 import com.example.springsecurityjwt.jwt.JwtAuthenticationEntryPoint;
 import com.example.springsecurityjwt.jwt.JwtRequestFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,9 +42,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         httpSecurity.csrf().disable()
                 // dont authenticate this particular request
                 .authorizeRequests()
-                .antMatchers("/authenticate")
+                .antMatchers(AuthenticationController.BASE_URL)
                 .permitAll()
-                .antMatchers(HttpMethod.POST, "/user")
+                .antMatchers(HttpMethod.POST, UserController.BASE_URL)
                 .permitAll().
                 // all other requests need to be authenticated
                         anyRequest().authenticated().and().
