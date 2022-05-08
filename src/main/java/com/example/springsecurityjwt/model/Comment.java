@@ -38,4 +38,8 @@ public class Comment extends BaseEntity{
     @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @ManyToOne
+    @JoinColumn(name = "author_id")
+    private User user;
 }
