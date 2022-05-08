@@ -5,9 +5,13 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
 
-@Data
 @Entity
+@Data
 @NoArgsConstructor
 public class Role extends BaseEntity{
+
+    public Role(long id){
+        super(id);
+    }
     private String role;
 }
