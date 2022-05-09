@@ -27,16 +27,24 @@ public class User extends BaseEntity{
     private Date registeredAt;
     private String profile;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "remember_token_id")
+    private RememberToken token;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "password_retrieve_id")
+    private PasswordRetrieve passwordRetrieve;
+
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private List<Role> roles;
 
     private int isActive;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Post> posts;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Comment> comments;
 
     @CreatedDate
