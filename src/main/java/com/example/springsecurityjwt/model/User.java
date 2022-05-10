@@ -1,5 +1,6 @@
 package com.example.springsecurityjwt.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -27,11 +28,12 @@ public class User extends BaseEntity{
     private Date registeredAt;
     private String profile;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
     @JoinColumn(name = "remember_token_id")
+    @JsonManagedReference
     private RememberToken token;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "password_retrieve_id")
     private PasswordRetrieve passwordRetrieve;
 

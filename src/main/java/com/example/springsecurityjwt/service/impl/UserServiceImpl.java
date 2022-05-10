@@ -45,7 +45,7 @@ public class UserServiceImpl implements UserService {
     public Optional<UserDTO> getUser(Long id){
         Optional<User> user =  this.userDao.findById(id);
 
-        if(user.isEmpty()){
+        if(!user.isPresent()){
             throw new NotFoundException("User Not Found. for ID value" +id);
         }
 
@@ -58,7 +58,34 @@ public class UserServiceImpl implements UserService {
     }
     @Override
     public UserDTO save(User user){
-        return saveAndReturnDTO(user);
+        //save user
+        User savedUser = this.userDao.save(user);
+
+        RememberToken rememberToken = new RememberToken();
+        rememberToken.setToken(this.generateRandomToken(20));
+
+        //adding 20 minutes to the current time
+        Calendar present = Calendar.getInstance();
+        long timeInSecs = present.getTimeInMillis();
+        Date expiredAt = new Date(timeInSecs + (20*60*1000));
+
+        //save token
+        rememberToken.setUser(savedUser);
+        rememberToken.setExpiredAt(expiredAt);
+        RememberToken savedToken = this.rememberTokenDao.save(rememberToken);
+
+        //add token
+        savedUser.setToken(savedToken);
+
+        //update user
+        Optional<UserDTO> returnDTO = this.update(savedUser, savedUser.getId());
+
+        if(returnDTO.isPresent()){
+            returnDTO.get().setUserUrl(getUserUrl(savedUser.getId()));
+            returnDTO.get().setFullName(returnUserFullName(savedUser));
+        }
+
+        return returnDTO.get();
     }
 
     @Override
@@ -69,7 +96,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<UserDTO> update(User user, long id){
         Optional<User> currentUser = this.userDao.findById(id);
-        if(currentUser.isEmpty()){
+        if(!currentUser.isPresent()){
             throw new NotFoundException("User Not Found. for ID value" +id);
         }
 
@@ -102,34 +129,14 @@ public class UserServiceImpl implements UserService {
     }
 
     private UserDTO saveAndReturnDTO(User user){
-        //save user
         User savedUser = this.userDao.save(user);
 
-        RememberToken rememberToken = new RememberToken();
-        rememberToken.setToken(this.generateRandomToken(20));
+        UserDTO returnDTO = userMapper.userToUserDTO(savedUser);
 
-        //adding 20 minutes to the current time
-        Calendar present = Calendar.getInstance();
-        long timeInSecs = present.getTimeInMillis();
-        Date expiredAt = new Date(timeInSecs + (20*60*1000));
+        returnDTO.setFullName(returnUserFullName(savedUser));
+        returnDTO.setUserUrl(getUserUrl(savedUser.getId()));
 
-        //save token
-        rememberToken.setUser(savedUser);
-        rememberToken.setExpiredAt(expiredAt);
-        RememberToken savedToken = this.rememberTokenDao.save(rememberToken);
-
-        //add token
-        savedUser.setToken(rememberToken);
-
-        //update user
-        Optional<UserDTO> returnDTO = this.update(savedUser, savedUser.getId());
-
-        if(returnDTO.isPresent()){
-            returnDTO.get().setUserUrl(getUserUrl(savedUser.getId()));
-            returnDTO.get().setFullName(returnUserFullName(savedUser));
-        }
-
-        return returnDTO.get();
+        return returnDTO;
     }
 
     private String generateRandomToken(int length){
