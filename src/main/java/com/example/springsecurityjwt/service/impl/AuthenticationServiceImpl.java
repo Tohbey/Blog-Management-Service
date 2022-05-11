@@ -1,8 +1,11 @@
 package com.example.springsecurityjwt.service.impl;
 
+import com.example.springsecurityjwt.dao.UserDao;
 import com.example.springsecurityjwt.jwt.JwtUtils;
 import com.example.springsecurityjwt.model.AuthenticationRequest;
 import com.example.springsecurityjwt.model.AuthenticationResponse;
+import com.example.springsecurityjwt.model.User;
+import com.example.springsecurityjwt.model.VerificationRequest;
 import com.example.springsecurityjwt.service.AuthenticationService;
 import com.example.springsecurityjwt.webConfig.CustomDetail;
 import com.example.springsecurityjwt.webConfig.CustomDetailService;
@@ -13,6 +16,8 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
     @Autowired
@@ -20,6 +25,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Autowired
     private JwtUtils jwtTokenUtil;
+
+    @Autowired
+    private UserDao userDao;
 
     @Autowired
     private CustomDetailService userDetailsService;
@@ -37,7 +45,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public void verifyUser() {
+    public void verifyUser(VerificationRequest verificationRequest)  throws Exception{
 
     }
 
