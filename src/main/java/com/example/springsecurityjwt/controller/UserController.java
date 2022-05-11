@@ -2,11 +2,9 @@ package com.example.springsecurityjwt.controller;
 
 import com.example.springsecurityjwt.api.v1.DTO.UserDTO;
 import com.example.springsecurityjwt.api.v1.DTO.UserListDTO;
-import com.example.springsecurityjwt.dtos.BaseDto;
 import com.example.springsecurityjwt.dtos.ResponseObject;
 import com.example.springsecurityjwt.model.User;
 import com.example.springsecurityjwt.service.UserService;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;

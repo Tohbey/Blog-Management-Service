@@ -1,6 +1,8 @@
 package com.example.springsecurityjwt.service.impl;
 
+import com.example.springsecurityjwt.api.v1.DTO.RememberTokenDTO;
 import com.example.springsecurityjwt.api.v1.DTO.UserDTO;
+import com.example.springsecurityjwt.api.v1.mapper.RememberTokenMapper;
 import com.example.springsecurityjwt.api.v1.mapper.UserMapper;
 import com.example.springsecurityjwt.controller.UserController;
 import com.example.springsecurityjwt.dao.RememberTokenDao;
@@ -19,13 +21,17 @@ public class UserServiceImpl implements UserService {
     private final RememberTokenDao rememberTokenDao;
 
     private UserMapper userMapper;
+
+    private RememberTokenMapper rememberTokenMapper;
+
     final String alphabet = "0123456789ABCDE";
     final int N = alphabet.length();
 
-    public UserServiceImpl(UserDao userDao, RememberTokenDao rememberTokenDao, UserMapper userMapper){
+    public UserServiceImpl(UserDao userDao, RememberTokenDao rememberTokenDao, UserMapper userMapper, RememberTokenMapper rememberTokenMapper){
         this.userDao = userDao;
         this.rememberTokenDao = rememberTokenDao;
         this.userMapper = userMapper;
+        this.rememberTokenMapper = rememberTokenMapper;
     }
 
     @Override
@@ -45,7 +51,7 @@ public class UserServiceImpl implements UserService {
     public Optional<UserDTO> getUser(Long id){
         Optional<User> user =  this.userDao.findById(id);
 
-        if(!user.isPresent()){
+        if(user.isEmpty()){
             throw new NotFoundException("User Not Found. for ID value" +id);
         }
 
@@ -57,7 +63,12 @@ public class UserServiceImpl implements UserService {
                });
     }
     @Override
-    public UserDTO save(User user){
+    public UserDTO save(User user) throws Exception {
+        Optional<User> checkUer =  this.userDao.findUserByEmail(user.getEmail());
+        if(checkUer.isPresent()){
+            throw  new Exception("A user with this email already exist "+checkUer.get().getEmail());
+        }
+
         //save user
         User savedUser = this.userDao.save(user);
 
@@ -74,6 +85,10 @@ public class UserServiceImpl implements UserService {
         rememberToken.setExpiredAt(expiredAt);
         RememberToken savedToken = this.rememberTokenDao.save(rememberToken);
 
+        //remember token dto
+        RememberTokenDTO rememberTokenDTO = this.rememberTokenMapper.rememberTokenToRememberTokenDTO(savedToken);
+        rememberTokenDTO.setUserURL(getUserUrl(savedUser.getId()));
+
         //add token
         savedUser.setToken(savedToken);
 
@@ -83,6 +98,7 @@ public class UserServiceImpl implements UserService {
         if(returnDTO.isPresent()){
             returnDTO.get().setUserUrl(getUserUrl(savedUser.getId()));
             returnDTO.get().setFullName(returnUserFullName(savedUser));
+            returnDTO.get().setToken(rememberTokenDTO);
         }
 
         return returnDTO.get();
@@ -96,7 +112,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<UserDTO> update(User user, long id){
         Optional<User> currentUser = this.userDao.findById(id);
-        if(!currentUser.isPresent()){
+        if(currentUser.isEmpty()){
             throw new NotFoundException("User Not Found. for ID value" +id);
         }
 
@@ -111,14 +127,6 @@ public class UserServiceImpl implements UserService {
 
             if(user.getOtherNames() != null){
                 user1.setOtherNames(user.getOtherNames());
-            }
-
-            if(user.getPasswordRetrieve() != null){
-                user1.setPasswordRetrieve(user.getPasswordRetrieve());
-            }
-
-            if(user.getToken() != null){
-                user1.setToken(user.getToken());
             }
 
             if(user.getProfile() != null){
