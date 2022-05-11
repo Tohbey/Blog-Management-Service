@@ -6,8 +6,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 @Mapper
-public interface PasswordRememberMapper {
-    PasswordRememberMapper INSTANCE = Mappers.getMapper(PasswordRememberMapper.class);
+public interface PasswordRememberTokenMapper {
+    PasswordRememberTokenMapper INSTANCE = Mappers.getMapper(PasswordRememberTokenMapper.class);
 
     PasswordRetrieveDTO passwordRetrieveToPasswordRetrieveDTO(PasswordRetrieve passwordRetrieve);
 
