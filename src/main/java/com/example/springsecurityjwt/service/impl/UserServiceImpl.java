@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
         Optional<User> user =  this.userDao.findById(id);
 
         if(user.isEmpty()){
-            throw new NotFoundException("User Not Found. for ID value" +id);
+            throw new NotFoundException("User Not Found. for ID value " +id);
         }
 
        return user.map(userMapper::userToUserDTO)
@@ -132,6 +132,11 @@ public class UserServiceImpl implements UserService {
             if(user.getProfile() != null){
                 user1.setProfile(user.getProfile());
             }
+
+            if(user.getIsActive() == 0 || user.getIsActive() == 1){
+                user1.setIsActive(user.getIsActive());
+            }
+
             return saveAndReturnDTO(user1);
         });
     }
