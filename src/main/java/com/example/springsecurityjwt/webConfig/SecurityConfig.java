@@ -42,7 +42,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         httpSecurity.csrf().disable()
                 // dont authenticate this particular request
                 .authorizeRequests()
-                .antMatchers(AuthenticationController.BASE_URL).permitAll()
+                .antMatchers(HttpMethod.POST,AuthenticationController.BASE_URL).permitAll()
+                .antMatchers(HttpMethod.PATCH,AuthenticationController.BASE_URL+"/verify").permitAll()
                 .antMatchers(HttpMethod.POST, UserController.BASE_URL).permitAll().
                 // all other requests need to be authenticated
                         anyRequest().authenticated().and().

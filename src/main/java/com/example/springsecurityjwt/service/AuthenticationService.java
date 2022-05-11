@@ -1,15 +1,17 @@
 package com.example.springsecurityjwt.service;
 
+import com.example.springsecurityjwt.api.v1.DTO.UserDTO;
 import com.example.springsecurityjwt.model.AuthenticationRequest;
 import com.example.springsecurityjwt.model.AuthenticationResponse;
 import com.example.springsecurityjwt.model.VerificationRequest;
-import org.springframework.http.ResponseEntity;
+
+import java.util.Optional;
 
 public interface AuthenticationService {
 
     AuthenticationResponse createAuthenticationToken(AuthenticationRequest authenticationRequest) throws Exception;
 
-    void verifyUser(VerificationRequest verificationRequest) throws Exception;
+    Optional<UserDTO> verifyUser(VerificationRequest verificationRequest) throws Exception;
 
     void changePassword();
 

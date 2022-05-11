@@ -26,7 +26,7 @@ public class RememberToken extends BaseEntity{
     @Column(name = "created_at")
     private Date createdAt;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 }

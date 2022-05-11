@@ -1,12 +1,13 @@
 package com.example.springsecurityjwt.service.impl;
 
+import com.example.springsecurityjwt.api.v1.DTO.UserDTO;
+import com.example.springsecurityjwt.dao.RememberTokenDao;
 import com.example.springsecurityjwt.dao.UserDao;
+import com.example.springsecurityjwt.exceptions.NotFoundException;
 import com.example.springsecurityjwt.jwt.JwtUtils;
-import com.example.springsecurityjwt.model.AuthenticationRequest;
-import com.example.springsecurityjwt.model.AuthenticationResponse;
-import com.example.springsecurityjwt.model.User;
-import com.example.springsecurityjwt.model.VerificationRequest;
+import com.example.springsecurityjwt.model.*;
 import com.example.springsecurityjwt.service.AuthenticationService;
+import com.example.springsecurityjwt.service.UserService;
 import com.example.springsecurityjwt.webConfig.CustomDetail;
 import com.example.springsecurityjwt.webConfig.CustomDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private UserDao userDao;
 
     @Autowired
+    private RememberTokenDao rememberTokenDao;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
     private CustomDetailService userDetailsService;
+
 
     @Override
     public AuthenticationResponse createAuthenticationToken(AuthenticationRequest authenticationRequest) throws Exception {
@@ -45,8 +53,31 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public void verifyUser(VerificationRequest verificationRequest)  throws Exception{
+    public Optional<UserDTO> verifyUser(VerificationRequest verificationRequest) throws Exception {
+        //find user
+        Optional<User> user = userDao.findUserByEmail(verificationRequest.getEmail());
+        if(user.isEmpty()){
+            throw new NotFoundException("User Not Found. for ID value " +verificationRequest.getEmail());
+        }
 
+        //find token
+        Optional<RememberToken> rememberToken = rememberTokenDao.findRememberTokenByToken(verificationRequest.getToken());
+        if(rememberToken.isEmpty()){
+            throw new NotFoundException("User Not Found. for ID value " +verificationRequest.getEmail());
+        }
+
+        //validate the token
+        if(!user.get().getToken().getToken().equals(rememberToken.get().getToken())){
+            throw new Exception("Incorrect Token");
+        }
+
+        //update user
+        user.get().setIsActive(1);
+        user.get().setToken(null);
+
+        rememberTokenDao.deleteById(rememberToken.get().getId());
+
+        return userService.update(user.get(), user.get().getId());
     }
 
     @Override
