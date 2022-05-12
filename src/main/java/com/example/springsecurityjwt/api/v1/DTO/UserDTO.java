@@ -1,7 +1,6 @@
 package com.example.springsecurityjwt.api.v1.DTO;
 
-import com.example.springsecurityjwt.model.PasswordRetrieve;
-import com.example.springsecurityjwt.model.RememberToken;
+
 import com.example.springsecurityjwt.model.Role;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

@@ -6,6 +6,7 @@ import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import java.util.Date;
 
@@ -27,5 +28,6 @@ public class PasswordRetrieve extends BaseEntity{
     private Date createdAt;
 
     @OneToOne(mappedBy = "passwordRetrieve")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 }
