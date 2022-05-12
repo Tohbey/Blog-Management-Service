@@ -73,7 +73,7 @@ public class UserServiceImpl implements UserService {
         User savedUser = this.userDao.save(user);
 
         RememberToken rememberToken = new RememberToken();
-        rememberToken.setToken(this.generateRandomToken(20));
+        rememberToken.setToken(generateRandomToken(20));
 
         //adding 20 minutes to the current time
         Calendar present = Calendar.getInstance();
@@ -152,7 +152,8 @@ public class UserServiceImpl implements UserService {
         return returnDTO;
     }
 
-    private String generateRandomToken(int length){
+    @Override
+    public String generateRandomToken(int length){
         String token = "";
 
         Random r = new Random();

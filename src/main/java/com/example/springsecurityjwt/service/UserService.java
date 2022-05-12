@@ -19,4 +19,6 @@ public interface UserService {
     void delete(long id);
 
     Optional<UserDTO> update(User user, long id);
+
+    String generateRandomToken(int length);
 }
