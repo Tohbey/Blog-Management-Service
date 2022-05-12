@@ -14,9 +14,9 @@ public interface AuthenticationService {
     Boolean checkIfValidOldPassword(User user, String oldPassword);
     UserDTO changePassword(ForgotPasswordRequest forgotPasswordRequest) throws Exception;
 
-    void recover();
+    UserDTO recover(RecoverRequest recoverRequest);
 
-    void reset();
+    Optional<User> reset(String email, String token) throws Exception;
 
-    void resetPassword();
+    UserDTO resetPassword(ResetPasswordRequest resetPasswordRequest) throws Exception;
 }

@@ -15,7 +15,7 @@ public class UserDTO {
     private String email;
     private List<Role> roles;
     private RememberTokenDTO token;
-    private PasswordRetrieve passwordRetrieve;
+    private PasswordRetrieveDTO passwordRetrieve;
     private String profile;
 
     @JsonProperty("user_url")
