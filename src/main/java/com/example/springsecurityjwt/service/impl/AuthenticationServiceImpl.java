@@ -173,12 +173,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new NotFoundException("User Not Found. for EMAIL value " +email);
         }
 
-        Optional<PasswordRetrieve> passwordRetrieve = passwordRetrieveDao.findPasswordRetrieveByResetPasswordToken(email);
+        Optional<PasswordRetrieve> passwordRetrieve = passwordRetrieveDao.findPasswordRetrieveByResetPasswordToken(token);
         if(passwordRetrieve.isEmpty()){
             throw new NotFoundException("Token Not Found. for TOKEN value " +token);
         }
 
-        if(!user.get().getToken().getToken().equals(passwordRetrieve.get().getResetPasswordToken())){
+        if(!user.get().getPasswordRetrieve().getResetPasswordToken().equals(passwordRetrieve.get().getResetPasswordToken())){
             throw new Exception("Incorrect Token");
         }
 
@@ -191,11 +191,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         String encryptPwd = passwordEncoder.encode(resetPasswordRequest.getPassword());
         user.get().setPassword(encryptPwd);
+
+        Optional<PasswordRetrieve> passwordRetrieve = passwordRetrieveDao.findPasswordRetrieveByResetPasswordToken(resetPasswordRequest.getToken());
+        if(passwordRetrieve.isEmpty()){
+            throw new NotFoundException("Token Not Found. for TOKEN value " +resetPasswordRequest.getToken());
+        }
+        passwordRetrieveDao.deleteById(passwordRetrieve.get().getId());
+
         user.get().setPasswordRetrieve(null);
-
-        Optional<RememberToken> rememberToken = rememberTokenDao.findRememberTokenByToken(resetPasswordRequest.getToken());
-        rememberTokenDao.deleteById(rememberToken.get().getId());
-
         User savedUser = user.map(user1 -> {
             user1.setPassword(user.get().getPassword());
 
@@ -204,7 +207,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             return userDao.save(user.get());
         });
 
-        return userMapper.userToUserDTO(savedUser);
+        UserDTO userDTO = userMapper.userToUserDTO(savedUser);
+        userDTO.setUserUrl(getUserUrl(userDTO.getId()));
+        userDTO.setFullName(returnUserFullName(savedUser));
+
+        return userDTO;
     }
 
     private void authenticate(String username, String password) throws Exception {

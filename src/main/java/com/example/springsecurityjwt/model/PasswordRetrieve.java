@@ -27,7 +27,7 @@ public class PasswordRetrieve extends BaseEntity{
     @Column(name = "created_at")
     private Date createdAt;
 
-    @OneToOne(mappedBy = "passwordRetrieve")
+    @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 }
