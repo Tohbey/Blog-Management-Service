@@ -4,6 +4,7 @@ import com.example.springsecurityjwt.api.v1.DTO.UserDTO;
 import com.example.springsecurityjwt.dtos.ResponseObject;
 import com.example.springsecurityjwt.model.AuthenticationRequest;
 import com.example.springsecurityjwt.model.AuthenticationResponse;
+import com.example.springsecurityjwt.model.ForgotPasswordRequest;
 import com.example.springsecurityjwt.model.VerificationRequest;
 import com.example.springsecurityjwt.service.AuthenticationService;
 import org.springframework.http.ResponseEntity;
@@ -59,8 +60,20 @@ public class AuthenticationController {
         return ResponseEntity.ok().body(responseObject);
     }
 
-    public void changePassword(){
-
+    @RequestMapping(method = RequestMethod.PATCH,value = "/change-password")
+    public ResponseEntity<ResponseObject> changePassword(@RequestBody ForgotPasswordRequest forgotPasswordRequest){
+        ResponseObject responseObject = new ResponseObject();
+        try {
+            UserDTO userDTO = authenticationService.changePassword(forgotPasswordRequest);
+            responseObject.setData(userDTO);
+            responseObject.setValid(true);
+            responseObject.setMessage("Password Updated Successful");
+        }catch (Exception e){
+            responseObject.setValid(false);
+            responseObject.setMessage(e.getMessage());
+            e.printStackTrace();
+        }
+        return ResponseEntity.ok().body(responseObject);
     }
 
     public void recover(){}

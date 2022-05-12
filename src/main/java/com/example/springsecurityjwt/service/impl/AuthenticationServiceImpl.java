@@ -1,6 +1,7 @@
 package com.example.springsecurityjwt.service.impl;
 
 import com.example.springsecurityjwt.api.v1.DTO.UserDTO;
+import com.example.springsecurityjwt.api.v1.mapper.UserMapper;
 import com.example.springsecurityjwt.dao.RememberTokenDao;
 import com.example.springsecurityjwt.dao.UserDao;
 import com.example.springsecurityjwt.exceptions.NotFoundException;
@@ -15,6 +16,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -36,6 +39,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     @Autowired
     private CustomDetailService userDetailsService;
 
@@ -81,8 +89,34 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public void changePassword() {
+    public Boolean checkIfValidOldPassword(User user, String oldPassword) {
+        return passwordEncoder.matches(oldPassword, user.getPassword());
+    }
 
+    @Override
+    public UserDTO changePassword(ForgotPasswordRequest forgotPasswordRequest) throws Exception {
+        CustomDetail userDetail = (CustomDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = userDetail.getUsername();
+        Optional<User> user = userDao.findUserByEmail(email);
+        if(user.isEmpty()){
+            throw new NotFoundException("User Not Found. for ID value " +email);
+        }
+        if(!checkIfValidOldPassword(user.get(), forgotPasswordRequest.getOldPassword())){
+            throw new Exception("Invalid Old Password");
+        }
+
+        String pwd = forgotPasswordRequest.getNewPassword();
+        String encryptPwd = passwordEncoder.encode(pwd);
+        user.get().setPassword(encryptPwd);
+
+        User savedUser = user.map(user1->{
+            user1.setPassword(user.get().getPassword());
+            return userDao.save(user1);
+        }).orElseGet(() -> {
+            return userDao.save(user.get());
+        });
+
+        return userMapper.userToUserDTO(savedUser);
     }
 
     @Override
