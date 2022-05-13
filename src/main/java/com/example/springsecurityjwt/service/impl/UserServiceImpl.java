@@ -113,13 +113,13 @@ public class UserServiceImpl implements UserService {
                 user1.setOtherNames(user.getOtherNames());
             }
 
-            if(user.getPasswordRetrieve() != null){
-                user1.setPasswordRetrieve(user.getPasswordRetrieve());
-            }
-
-            if(user.getToken() != null){
-                user1.setToken(user.getToken());
-            }
+//            if(user.getPasswordRetrieve() != null){
+//                user1.setPasswordRetrieve(user.getPasswordRetrieve());
+//            }
+//
+//            if(user.getToken() != null){
+//                user1.setToken(user.getToken());
+//            }
 
             if(user.getProfile() != null){
                 user1.setProfile(user.getProfile());
