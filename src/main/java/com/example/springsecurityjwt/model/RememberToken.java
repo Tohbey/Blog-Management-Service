@@ -1,6 +1,7 @@
 package com.example.springsecurityjwt.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -25,7 +26,7 @@ public class RememberToken extends BaseEntity{
     @Column(name = "created_at")
     private Date createdAt;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 }

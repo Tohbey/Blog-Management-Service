@@ -28,9 +28,8 @@ public class User extends BaseEntity{
     private Date registeredAt;
     private String profile;
 
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "remember_token_id")
-    @JsonManagedReference
     private RememberToken token;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)

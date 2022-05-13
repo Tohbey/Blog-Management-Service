@@ -2,11 +2,15 @@ package com.example.springsecurityjwt.controller;
 
 import com.example.springsecurityjwt.api.v1.DTO.UserDTO;
 import com.example.springsecurityjwt.api.v1.DTO.UserListDTO;
+import com.example.springsecurityjwt.dtos.ResponseObject;
 import com.example.springsecurityjwt.model.User;
 import com.example.springsecurityjwt.service.UserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -24,30 +28,85 @@ public class UserController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public UserListDTO getAllUsers(){
-        return new UserListDTO(this.userService.getAllUser());
+    public  ResponseEntity<ResponseObject> getAllUsers(){
+        ResponseObject object = new ResponseObject();
+        try{
+            List<UserDTO> userList = userService.getAllUser();
+            object.setData(new UserListDTO(userList));
+            object.setValid(true);
+            object.setMessage("Resource Retrieved Successfully");
+        }catch (Exception e){
+            object.setValid(false);
+            object.setMessage(e.getMessage());
+            e.printStackTrace();
+        }
+        return ResponseEntity.ok().body(object);
     }
 
     @RequestMapping(value ="/{id}" ,method = RequestMethod.GET)
-    public Optional<UserDTO> getUserById(@PathVariable long id){
-        return this.userService.getUser(id);
+    public ResponseEntity<ResponseObject> getUserById(@PathVariable long id){
+        ResponseObject responseObject = new ResponseObject();
+        try{
+            Optional<UserDTO> userDTO = userService.getUser(id);
+            responseObject.setData(userDTO);
+            responseObject.setValid(true);
+            responseObject.setMessage("Resource Retrieved Successfully");
+        }catch (Exception e){
+            responseObject.setValid(false);
+            responseObject.setMessage(e.getMessage());
+            e.printStackTrace();
+        }
+        return ResponseEntity.ok().body(responseObject);
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public UserDTO insertUser(@RequestBody User user){
-        String pwd = user.getPassword();
-        String encryptPwd = this.passwordEncoder.encode(pwd);
-        user.setPassword(encryptPwd);
-        return this.userService.save(user);
+    public ResponseEntity<ResponseObject> insertUser(@RequestBody User user){
+        ResponseObject responseObject = new ResponseObject();
+        try{
+            String pwd = user.getPassword();
+            String encryptPwd = this.passwordEncoder.encode(pwd);
+            user.setPassword(encryptPwd);
+
+            UserDTO userDTO = userService.save(user);
+            responseObject.setData(userDTO);
+            responseObject.setValid(true);
+            responseObject.setMessage("Resource Created Successfully");
+        }catch (Exception e){
+            responseObject.setValid(false);
+            responseObject.setMessage(e.getMessage());
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(responseObject, HttpStatus.CREATED);
     }
 
     @RequestMapping(value ="/{id}" ,method = RequestMethod.DELETE)
-    public void deleteUser(@PathVariable long id){
-        this.userService.delete(id);
+    public ResponseEntity<ResponseObject> deleteUser(@PathVariable long id){
+        ResponseObject responseObject = new ResponseObject();
+        try{
+            userService.delete(id);
+            responseObject.setValid(true);
+            responseObject.setMessage("Resource Deleted Successfully");
+        }catch (Exception e){
+            responseObject.setValid(false);
+            responseObject.setMessage(e.getMessage());
+            e.printStackTrace();
+        }
+        return ResponseEntity.ok().body(responseObject);
     }
 
     @RequestMapping(value ="/{id}" ,method = RequestMethod.PUT)
-    public Optional<UserDTO> updateUser(@PathVariable long id, @RequestBody User user){
-        return this.userService.update(user, id);
+    public ResponseEntity<ResponseObject> updateUser(@PathVariable long id, @RequestBody User user){
+        ResponseObject responseObject = new ResponseObject();
+        try{
+            Optional<UserDTO> userDTO = userService.update(user, id);
+            responseObject.setData(userDTO);
+            responseObject.setValid(true);
+            responseObject.setMessage("Resource Updated Successfully");
+        }catch (Exception e){
+            responseObject.setValid(false);
+            responseObject.setMessage(e.getMessage());
+            e.printStackTrace();
+        }
+        return ResponseEntity.ok().body(responseObject);
     }
 }

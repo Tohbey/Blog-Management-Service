@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -42,7 +43,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         httpSecurity.csrf().disable()
                 // dont authenticate this particular request
                 .authorizeRequests()
-                .antMatchers(AuthenticationController.BASE_URL).permitAll()
+                .antMatchers(HttpMethod.POST,AuthenticationController.BASE_URL).permitAll()
+                .antMatchers(HttpMethod.PATCH,AuthenticationController.BASE_URL+"/verify").permitAll()
+                .antMatchers(HttpMethod.POST,AuthenticationController.BASE_URL+"/reset-password").permitAll()
+                .antMatchers(HttpMethod.POST,AuthenticationController.BASE_URL+"/reset").permitAll()
+//                .antMatchers(HttpMethod.GET,AuthenticationController.BASE_URL+"/forgot").permitAll()
                 .antMatchers(HttpMethod.POST, UserController.BASE_URL).permitAll().
                 // all other requests need to be authenticated
                         anyRequest().authenticated().and().
@@ -57,7 +62,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public PasswordEncoder passwordEncoder(){
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+        return new BCryptPasswordEncoder();
     }
 
     @Override

@@ -14,9 +14,11 @@ public interface UserService {
 
     Optional<UserDTO> getUser(Long id);
 
-    UserDTO save(User user);
+    UserDTO save(User user) throws Exception;
 
     void delete(long id);
 
     Optional<UserDTO> update(User user, long id);
+
+    String generateRandomToken(int length);
 }
