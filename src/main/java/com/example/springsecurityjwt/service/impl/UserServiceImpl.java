@@ -12,6 +12,7 @@ import com.example.springsecurityjwt.model.RememberToken;
 import com.example.springsecurityjwt.model.User;
 import com.example.springsecurityjwt.service.UserService;
 import org.springframework.stereotype.Service;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -27,7 +28,7 @@ public class UserServiceImpl implements UserService {
     final String alphabet = "0123456789ABCDE";
     final int N = alphabet.length();
 
-    public UserServiceImpl(UserDao userDao, RememberTokenDao rememberTokenDao, UserMapper userMapper, RememberTokenMapper rememberTokenMapper){
+    public UserServiceImpl(UserDao userDao, RememberTokenDao rememberTokenDao, UserMapper userMapper, RememberTokenMapper rememberTokenMapper) {
         this.userDao = userDao;
         this.rememberTokenDao = rememberTokenDao;
         this.userMapper = userMapper;
@@ -35,7 +36,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDTO> getAllUser(){
+    public List<UserDTO> getAllUser() {
         return this.userDao
                 .findAll().stream().map(
                         user -> {
@@ -47,26 +48,28 @@ public class UserServiceImpl implements UserService {
                         }
                 ).collect(Collectors.toList());
     }
-    @Override
-    public Optional<UserDTO> getUser(Long id){
-        Optional<User> user =  this.userDao.findById(id);
 
-        if(user.isEmpty()){
-            throw new NotFoundException("User Not Found. for ID value " +id);
+    @Override
+    public Optional<UserDTO> getUser(Long id) {
+        Optional<User> user = this.userDao.findById(id);
+
+        if (user.isEmpty()) {
+            throw new NotFoundException("User Not Found. for ID value " + id);
         }
 
-       return user.map(userMapper::userToUserDTO)
-               .map(userDTO -> {
-                   userDTO.setUserUrl(getUserUrl(user.get().getId()));
-                   userDTO.setFullName(returnUserFullName(user.get()));
-                   return userDTO;
-               });
+        return user.map(userMapper::userToUserDTO)
+                .map(userDTO -> {
+                    userDTO.setUserUrl(getUserUrl(user.get().getId()));
+                    userDTO.setFullName(returnUserFullName(user.get()));
+                    return userDTO;
+                });
     }
+
     @Override
     public UserDTO save(User user) throws Exception {
-        Optional<User> checkUer =  this.userDao.findUserByEmail(user.getEmail());
-        if(checkUer.isPresent()){
-            throw  new Exception("A user with this email already exist "+checkUer.get().getEmail());
+        Optional<User> checkUer = this.userDao.findUserByEmail(user.getEmail());
+        if (checkUer.isPresent()) {
+            throw new Exception("A user with this email already exist " + checkUer.get().getEmail());
         }
 
         //save user
@@ -78,7 +81,7 @@ public class UserServiceImpl implements UserService {
         //adding 20 minutes to the current time
         Calendar present = Calendar.getInstance();
         long timeInSecs = present.getTimeInMillis();
-        Date expiredAt = new Date(timeInSecs + (20*60*1000));
+        Date expiredAt = new Date(timeInSecs + (20 * 60 * 1000));
 
         //save token
         rememberToken.setUser(savedUser);
@@ -95,7 +98,7 @@ public class UserServiceImpl implements UserService {
         //update user
         Optional<UserDTO> returnDTO = this.update(savedUser, savedUser.getId());
 
-        if(returnDTO.isPresent()){
+        if (returnDTO.isPresent()) {
             returnDTO.get().setUserUrl(getUserUrl(savedUser.getId()));
             returnDTO.get().setFullName(returnUserFullName(savedUser));
             returnDTO.get().setToken(rememberTokenDTO);
@@ -105,35 +108,35 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void delete(long id){
+    public void delete(long id) {
         this.userDao.deleteById(id);
     }
 
     @Override
-    public Optional<UserDTO> update(User user, long id){
+    public Optional<UserDTO> update(User user, long id) {
         Optional<User> currentUser = this.userDao.findById(id);
-        if(currentUser.isEmpty()){
-            throw new NotFoundException("User Not Found. for ID value" +id);
+        if (currentUser.isEmpty()) {
+            throw new NotFoundException("User Not Found. for ID value" + id);
         }
 
         return currentUser.map(user1 -> {
-            if(user.getEmail() != null){
+            if (user.getEmail() != null) {
                 user1.setEmail(user.getEmail());
             }
 
-            if(user.getSurname() != null){
+            if (user.getSurname() != null) {
                 user1.setSurname(user.getSurname());
             }
 
-            if(user.getOtherNames() != null){
+            if (user.getOtherNames() != null) {
                 user1.setOtherNames(user.getOtherNames());
             }
 
-            if(user.getProfile() != null){
+            if (user.getProfile() != null) {
                 user1.setProfile(user.getProfile());
             }
 
-            if(user.getIsActive() == 0 || user.getIsActive() == 1){
+            if (user.getIsActive() == 0 || user.getIsActive() == 1) {
                 user1.setIsActive(user.getIsActive());
             }
 
@@ -141,7 +144,7 @@ public class UserServiceImpl implements UserService {
         });
     }
 
-    private UserDTO saveAndReturnDTO(User user){
+    private UserDTO saveAndReturnDTO(User user) {
         User savedUser = this.userDao.save(user);
 
         UserDTO returnDTO = userMapper.userToUserDTO(savedUser);
@@ -153,22 +156,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String generateRandomToken(int length){
+    public String generateRandomToken(int length) {
         String token = "";
 
         Random r = new Random();
-        for(int i =0; i<length;i++){
+        for (int i = 0; i < length; i++) {
             String s = token + alphabet.charAt(r.nextInt(N));
 
             token = s;
         }
         return token;
     }
-    private String getUserUrl(long id){
-        return UserController.BASE_URL + "/"+id;
+
+    private String getUserUrl(long id) {
+        return UserController.BASE_URL + "/" + id;
     }
 
-    private String returnUserFullName(User user){
-        return user.getSurname() +" "+user.getOtherNames();
+    private String returnUserFullName(User user) {
+        return user.getSurname() + " " + user.getOtherNames();
     }
 }

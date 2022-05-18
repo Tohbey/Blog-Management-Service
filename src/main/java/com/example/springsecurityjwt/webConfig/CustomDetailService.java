@@ -17,12 +17,12 @@ public class CustomDetailService implements UserDetailsService {
     @Override
     public CustomDetail loadUserByUsername(String email) throws UsernameNotFoundException {
         Optional<User> user = this.userDao.findUserByEmail(email);
-        CustomDetail userDetail  = null;
-        if(user.isPresent()){
-            userDetail= new CustomDetail();
+        CustomDetail userDetail = null;
+        if (user.isPresent()) {
+            userDetail = new CustomDetail();
             userDetail.setUser(user.get());
-        }else{
-            throw  new UsernameNotFoundException("user not exist with email: " +email);
+        } else {
+            throw new UsernameNotFoundException("user not exist with email: " + email);
         }
         return userDetail;
     }

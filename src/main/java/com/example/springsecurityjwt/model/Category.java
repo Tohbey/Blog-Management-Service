@@ -9,9 +9,9 @@ import javax.persistence.ManyToOne;
 @Data
 @Entity
 @NoArgsConstructor
-public class Category extends BaseEntity{
+public class Category extends BaseEntity {
 
-    public Category(long id){
+    public Category(long id) {
         super(id);
     }
 

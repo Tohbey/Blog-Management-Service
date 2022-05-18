@@ -14,8 +14,8 @@ import java.util.List;
 @Data
 @Entity
 @NoArgsConstructor
-public class Comment extends BaseEntity{
-    public Comment(long id){
+public class Comment extends BaseEntity {
+    public Comment(long id) {
         super(id);
     }
 

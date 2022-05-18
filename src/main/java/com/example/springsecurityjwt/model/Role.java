@@ -8,10 +8,11 @@ import javax.persistence.Entity;
 @Entity
 @Data
 @NoArgsConstructor
-public class Role extends BaseEntity{
+public class Role extends BaseEntity {
 
-    public Role(long id){
+    public Role(long id) {
         super(id);
     }
+
     private String role;
 }

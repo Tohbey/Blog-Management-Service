@@ -75,18 +75,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public Optional<UserDTO> verifyUser(VerificationRequest verificationRequest) throws Exception {
         //find user
         Optional<User> user = userDao.findUserByEmail(verificationRequest.getEmail());
-        if(user.isEmpty()){
-            throw new NotFoundException("User Not Found. for EMAIL value " +verificationRequest.getEmail());
+        if (user.isEmpty()) {
+            throw new NotFoundException("User Not Found. for EMAIL value " + verificationRequest.getEmail());
         }
 
         //find token
         Optional<RememberToken> rememberToken = rememberTokenDao.findRememberTokenByToken(verificationRequest.getToken());
-        if(rememberToken.isEmpty()){
-            throw new NotFoundException("User Not Found. for EMAIL value " +verificationRequest.getEmail());
+        if (rememberToken.isEmpty()) {
+            throw new NotFoundException("User Not Found. for EMAIL value " + verificationRequest.getEmail());
         }
 
         //validate the token
-        if(!user.get().getToken().getToken().equals(rememberToken.get().getToken())){
+        if (!user.get().getToken().getToken().equals(rememberToken.get().getToken())) {
             throw new Exception("Incorrect Token");
         }
 
@@ -109,10 +109,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         CustomDetail userDetail = (CustomDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String email = userDetail.getUsername();
         Optional<User> user = userDao.findUserByEmail(email);
-        if(user.isEmpty()){
-            throw new NotFoundException("User Not Found. for EMAIL value " +email);
+        if (user.isEmpty()) {
+            throw new NotFoundException("User Not Found. for EMAIL value " + email);
         }
-        if(!checkIfValidOldPassword(user.get(), forgotPasswordRequest.getOldPassword())){
+        if (!checkIfValidOldPassword(user.get(), forgotPasswordRequest.getOldPassword())) {
             throw new Exception("Invalid Old Password");
         }
 
@@ -120,7 +120,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         String encryptPwd = passwordEncoder.encode(pwd);
         user.get().setPassword(encryptPwd);
 
-        User savedUser = user.map(user1->{
+        User savedUser = user.map(user1 -> {
             user1.setPassword(user.get().getPassword());
             return userDao.save(user1);
         }).orElseGet(() -> {
@@ -133,8 +133,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public UserDTO recover(RecoverRequest recoverRequest) {
         Optional<User> user = userDao.findUserByEmail(recoverRequest.getEmail());
-        if(user.isEmpty()){
-            throw new NotFoundException("User Not Found. for EMAIL value " +recoverRequest.getEmail());
+        if (user.isEmpty()) {
+            throw new NotFoundException("User Not Found. for EMAIL value " + recoverRequest.getEmail());
         }
 
         String token = userService.generateRandomToken(20);
@@ -144,7 +144,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         //adding 20 minutes to the current time
         Calendar present = Calendar.getInstance();
         long timeInSecs = present.getTimeInMillis();
-        Date expiredAt = new Date(timeInSecs + (20*60*1000));
+        Date expiredAt = new Date(timeInSecs + (20 * 60 * 1000));
 
         //save token
         passwordRetrieve.setUser(user.get());
@@ -157,7 +157,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         user.get().setPasswordRetrieve(savedPasswordRetrieveToken);
 
-        Optional<UserDTO> returnDTO = userService.update(user.get(),user.get().getId());
+        Optional<UserDTO> returnDTO = userService.update(user.get(), user.get().getId());
 
         returnDTO.get().setUserUrl(getUserUrl(user.get().getId()));
         returnDTO.get().setFullName(returnUserFullName(user.get()));
@@ -169,16 +169,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public Optional<User> reset(String email, String token) throws Exception {
         Optional<User> user = userDao.findUserByEmail(email);
-        if(user.isEmpty()){
-            throw new NotFoundException("User Not Found. for EMAIL value " +email);
+        if (user.isEmpty()) {
+            throw new NotFoundException("User Not Found. for EMAIL value " + email);
         }
 
         Optional<PasswordRetrieve> passwordRetrieve = passwordRetrieveDao.findPasswordRetrieveByResetPasswordToken(token);
-        if(passwordRetrieve.isEmpty()){
-            throw new NotFoundException("Token Not Found. for TOKEN value " +token);
+        if (passwordRetrieve.isEmpty()) {
+            throw new NotFoundException("Token Not Found. for TOKEN value " + token);
         }
 
-        if(!user.get().getPasswordRetrieve().getResetPasswordToken().equals(passwordRetrieve.get().getResetPasswordToken())){
+        if (!user.get().getPasswordRetrieve().getResetPasswordToken().equals(passwordRetrieve.get().getResetPasswordToken())) {
             throw new Exception("Incorrect Token");
         }
 
@@ -193,8 +193,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         user.get().setPassword(encryptPwd);
 
         Optional<PasswordRetrieve> passwordRetrieve = passwordRetrieveDao.findPasswordRetrieveByResetPasswordToken(resetPasswordRequest.getToken());
-        if(passwordRetrieve.isEmpty()){
-            throw new NotFoundException("Token Not Found. for TOKEN value " +resetPasswordRequest.getToken());
+        if (passwordRetrieve.isEmpty()) {
+            throw new NotFoundException("Token Not Found. for TOKEN value " + resetPasswordRequest.getToken());
         }
         passwordRetrieveDao.deleteById(passwordRetrieve.get().getId());
 
@@ -224,11 +224,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
     }
 
-    private String getUserUrl(long id){
-        return UserController.BASE_URL + "/"+id;
+    private String getUserUrl(long id) {
+        return UserController.BASE_URL + "/" + id;
     }
 
-    private String returnUserFullName(User user){
-        return user.getSurname() +" "+user.getOtherNames();
+    private String returnUserFullName(User user) {
+        return user.getSurname() + " " + user.getOtherNames();
     }
 }

@@ -31,10 +31,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private JwtRequestFilter jwtRequestFilter;
 
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception{
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth
                 .userDetailsService(customDetailService)
-                .passwordEncoder(passwordEncoder());;
+                .passwordEncoder(passwordEncoder());
+        ;
     }
 
     @Override
@@ -43,10 +44,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         httpSecurity.csrf().disable()
                 // dont authenticate this particular request
                 .authorizeRequests()
-                .antMatchers(HttpMethod.POST,AuthenticationController.BASE_URL).permitAll()
-                .antMatchers(HttpMethod.PATCH,AuthenticationController.BASE_URL+"/verify").permitAll()
-                .antMatchers(HttpMethod.POST,AuthenticationController.BASE_URL+"/reset-password").permitAll()
-                .antMatchers(HttpMethod.POST,AuthenticationController.BASE_URL+"/reset").permitAll()
+                .antMatchers(HttpMethod.POST, AuthenticationController.BASE_URL).permitAll()
+                .antMatchers(HttpMethod.PATCH, AuthenticationController.BASE_URL + "/verify").permitAll()
+                .antMatchers(HttpMethod.POST, AuthenticationController.BASE_URL + "/reset-password").permitAll()
+                .antMatchers(HttpMethod.POST, AuthenticationController.BASE_URL + "/reset").permitAll()
 //                .antMatchers(HttpMethod.GET,AuthenticationController.BASE_URL+"/forgot").permitAll()
                 .antMatchers(HttpMethod.POST, UserController.BASE_URL).permitAll().
                 // all other requests need to be authenticated
@@ -61,13 +62,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Override
     @Bean
-    public AuthenticationManager authenticationManagerBean() throws Exception{
+    public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
 }

@@ -8,9 +8,9 @@ import javax.persistence.Entity;
 @Data
 @Entity
 @NoArgsConstructor
-public class Tag extends BaseEntity{
+public class Tag extends BaseEntity {
 
-    public Tag(long id){
+    public Tag(long id) {
         super(id);
     }
 

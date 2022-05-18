@@ -14,9 +14,9 @@ import java.util.List;
 @Entity
 @Data
 @NoArgsConstructor
-public class User extends BaseEntity{
+public class User extends BaseEntity {
 
-    public User(long id){
+    public User(long id) {
         super(id);
     }
 

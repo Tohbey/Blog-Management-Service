@@ -14,9 +14,9 @@ import java.util.List;
 @Data
 @Entity
 @NoArgsConstructor
-public class Post extends BaseEntity{
+public class Post extends BaseEntity {
 
-    public Post(long id){
+    public Post(long id) {
         super(id);
     }
 
@@ -40,11 +40,11 @@ public class Post extends BaseEntity{
     private User user;
 
     @OneToMany
-    @JoinTable(name="post_category", joinColumns = @JoinColumn(name="post_id"), inverseJoinColumns = @JoinColumn(name="category_id"))
+    @JoinTable(name = "post_category", joinColumns = @JoinColumn(name = "post_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
     private List<Category> categories;
 
     @OneToMany
-    @JoinTable(name="post_tag", joinColumns = @JoinColumn(name="post_id"), inverseJoinColumns = @JoinColumn(name="tag_id"))
+    @JoinTable(name = "post_tag", joinColumns = @JoinColumn(name = "post_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
     private List<Tag> tags;
 
     @CreatedDate

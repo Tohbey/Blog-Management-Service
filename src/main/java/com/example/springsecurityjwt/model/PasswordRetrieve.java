@@ -13,9 +13,9 @@ import java.util.Date;
 @Data
 @Entity
 @NoArgsConstructor
-public class PasswordRetrieve extends BaseEntity{
+public class PasswordRetrieve extends BaseEntity {
 
-    private PasswordRetrieve(long id){
+    private PasswordRetrieve(long id) {
         super(id);
     }
 

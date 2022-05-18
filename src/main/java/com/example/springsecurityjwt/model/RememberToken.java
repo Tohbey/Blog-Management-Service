@@ -12,9 +12,9 @@ import java.util.Date;
 @Data
 @Entity
 @NoArgsConstructor
-public class RememberToken extends BaseEntity{
+public class RememberToken extends BaseEntity {
 
-    public RememberToken(long id){
+    public RememberToken(long id) {
         super(id);
     }
 

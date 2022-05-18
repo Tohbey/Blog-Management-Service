@@ -11,10 +11,11 @@ import java.util.stream.Collectors;
 @Data
 public class CustomDetail implements UserDetails {
     private User user;
+
     @Override
     public List<SimpleGrantedAuthority> getAuthorities() {
         return user.getRoles().stream().map(r -> new
-                SimpleGrantedAuthority("ROLE_"+r)).collect(Collectors.toList());
+                SimpleGrantedAuthority("ROLE_" + r)).collect(Collectors.toList());
     }
 
     @Override

@@ -12,6 +12,7 @@ public interface AuthenticationService {
     Optional<UserDTO> verifyUser(VerificationRequest verificationRequest) throws Exception;
 
     Boolean checkIfValidOldPassword(User user, String oldPassword);
+
     UserDTO changePassword(ForgotPasswordRequest forgotPasswordRequest) throws Exception;
 
     UserDTO recover(RecoverRequest recoverRequest);

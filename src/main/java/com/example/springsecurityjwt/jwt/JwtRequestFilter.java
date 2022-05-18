@@ -24,22 +24,22 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private JwtUtils jwtTokenUtil;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException{
-        final String authorizationHeader= request.getHeader("Authorization");
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
+        final String authorizationHeader = request.getHeader("Authorization");
 
         String username = null;
         String jwt = null;
 
-        if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")){
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             jwt = authorizationHeader.substring(7); //leaving out "Bearer "
-            username = jwtTokenUtil.extractUsername(jwt);	//to extract username
+            username = jwtTokenUtil.extractUsername(jwt);    //to extract username
         }
 
         //verifying if username is not null and the security context doesnt have any value
-        if(username != null && SecurityContextHolder.getContext().getAuthentication() == null){
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             CustomDetail userDetails = this.customDetailService.loadUserByUsername(username); //get the userDetails
             //validate the token with userDetails
-            if(jwtTokenUtil.validateToken(jwt, userDetails)){
+            if (jwtTokenUtil.validateToken(jwt, userDetails)) {
                 //create a new username and password authentication token
                 //NB: dis will be normal operation for spring security by since we are overriding it we will have to set it up ourselves.
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
