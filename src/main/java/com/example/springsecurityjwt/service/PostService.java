@@ -8,13 +8,13 @@ import java.util.Optional;
 
 public interface PostService {
 
-    List<PostDTO> getAllPostByUser(Long userId);
+    List<PostDTO> getAllPostByUser();
 
     List<PostDTO> getAllPost();
 
     Optional<PostDTO> getPost(Long id);
 
-    PostDTO save(Post post);
+    PostDTO save(Post post) throws Exception;
 
     void delete(long id);
 }

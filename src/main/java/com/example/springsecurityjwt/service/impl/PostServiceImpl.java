@@ -8,6 +8,8 @@ import com.example.springsecurityjwt.controller.UserController;
 import com.example.springsecurityjwt.dao.PostDao;
 import com.example.springsecurityjwt.exceptions.NotFoundException;
 import com.example.springsecurityjwt.model.Post;
+import com.example.springsecurityjwt.model.User;
+import com.example.springsecurityjwt.service.AuthenticationService;
 import com.example.springsecurityjwt.service.PostService;
 import com.example.springsecurityjwt.service.UserService;
 import org.springframework.stereotype.Service;
@@ -21,19 +23,24 @@ public class PostServiceImpl implements PostService {
     private final PostDao postDao;
     private final PostMapper postMapper;
     private final UserService userService;
+    private final AuthenticationService authenticationService;
 
-    public PostServiceImpl(PostDao postDao, PostMapper postMapper, UserService userService){
+    public PostServiceImpl(PostDao postDao, PostMapper postMapper, UserService userService, AuthenticationService authenticationService){
         this.postDao = postDao;
         this.postMapper = postMapper;
         this.userService = userService;
+        this.authenticationService = authenticationService;
     }
 
     @Override
-    public List<PostDTO> getAllPostByUser(Long userId) {
+    public List<PostDTO> getAllPostByUser() {
+        Optional<User> user  = authenticationService.getCurrentUser();
         return this.postDao
-                .findAllByUser(userId).stream().map(
+                .findPostsByUser(user.get()).stream().map(
                         post -> {
                             PostDTO postDTO = postMapper.postToPostDTO(post);
+                            postDTO.setPostUrl(getPostUrl(post.getId()));
+                            postDTO.setAuthor(user.get().getSurname()+" "+user.get().getOtherNames());
                             return postDTO;
                         }
                 ).collect(Collectors.toList());
@@ -45,6 +52,9 @@ public class PostServiceImpl implements PostService {
                 .findAll().stream().map(
                         post -> {
                             PostDTO postDTO = postMapper.postToPostDTO(post);
+                            postDTO.setPostUrl(getPostUrl(post.getId()));
+                            postDTO.setAuthor(returnAuthorDetails(post.getUser().getId()));
+
                             return postDTO;
                         }
                 ).collect(Collectors.toList());
@@ -66,8 +76,22 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostDTO save(Post post) {
-        return null;
+    public PostDTO save(Post post) throws Exception {
+        Optional<Post> checkPost = this.postDao.findPostsByTitle(post.getTitle());
+        if (checkPost.isPresent()) {
+            throw new Exception("A post with this title already exist " + checkPost.get().getTitle());
+        }
+        Optional<User> user = authenticationService.getCurrentUser();
+        post.setUser(user.get());
+
+        Post savedPost = this.postDao.save(post);
+
+        PostDTO returnDTO = postMapper.postToPostDTO(post);
+
+        returnDTO.setAuthor(user.get().getSurname()+" "+user.get().getOtherNames());
+        returnDTO.setPostUrl(getPostUrl(savedPost.getId()));
+
+        return returnDTO;
     }
 
     @Override
