@@ -105,13 +105,21 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public UserDTO changePassword(ForgotPasswordRequest forgotPasswordRequest) throws Exception {
+    public Optional<User> getCurrentUser() {
         CustomDetail userDetail = (CustomDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String email = userDetail.getUsername();
         Optional<User> user = userDao.findUserByEmail(email);
         if (user.isEmpty()) {
             throw new NotFoundException("User Not Found. for EMAIL value " + email);
         }
+
+        return Optional.of(user.get());
+    }
+
+    @Override
+    public UserDTO changePassword(ForgotPasswordRequest forgotPasswordRequest) throws Exception {
+        Optional<User> user = getCurrentUser();
+
         if (!checkIfValidOldPassword(user.get(), forgotPasswordRequest.getOldPassword())) {
             throw new Exception("Invalid Old Password");
         }
