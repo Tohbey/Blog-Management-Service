@@ -1,6 +1,7 @@
 package com.example.springsecurityjwt.api.v1.DTO;
 
 import com.example.springsecurityjwt.model.Category;
+import com.example.springsecurityjwt.model.Post;
 import com.example.springsecurityjwt.model.Tag;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -20,6 +21,8 @@ public class PostDTO {
     private List<Tag> tags;
     private List<Category> categories;
     private Date uploaded;
+    private List<Post> children;
+    private Post parent;
 
     @JsonProperty("post_url")
     private String postUrl;
