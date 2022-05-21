@@ -100,4 +100,20 @@ public class PostController {
         }
         return ResponseEntity.ok().body(object);
     }
+
+    @RequestMapping(value = "/quote/{parentId}", method = RequestMethod.POST)
+    public ResponseEntity<ResponseObject> quotePost(@PathVariable long parentId, @RequestBody Post post){
+        ResponseObject object = new ResponseObject();
+        try {
+            PostDTO postDTO = postService.quotePost(parentId, post);
+            object.setData(postDTO);
+            object.setValid(true);
+            object.setMessage("Resource Created Successfully");
+        }catch (Exception e) {
+            object.setValid(false);
+            object.setMessage(e.getMessage());
+            e.printStackTrace();
+        }
+        return ResponseEntity.ok().body(object);
+    }
 }

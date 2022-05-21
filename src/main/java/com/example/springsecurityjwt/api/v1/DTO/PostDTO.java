@@ -21,8 +21,12 @@ public class PostDTO {
     private List<Tag> tags;
     private List<Category> categories;
     private Date uploaded;
-    private List<Post> children;
-    private Post parent;
+
+    @JsonProperty("children_post_urls")
+    private List<String> childrenPostUrl;
+
+    @JsonProperty("parent_post_url")
+    private String parentPostUrl;
 
     @JsonProperty("post_url")
     private String postUrl;

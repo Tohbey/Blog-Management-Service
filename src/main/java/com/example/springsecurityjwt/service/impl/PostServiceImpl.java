@@ -17,6 +17,7 @@ import com.example.springsecurityjwt.service.PostService;
 import com.example.springsecurityjwt.service.UserService;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -43,6 +44,40 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    public PostDTO quotePost(long parentId, Post childrenPost) throws Exception {
+        Optional<Post> parentPost = postDao.findById(parentId);
+        if(parentPost.isEmpty()){
+            throw new NotFoundException("Parent Post Not Found. for ID value " + parentId);
+        }
+        Optional<Post> checkChildrenPost = this.postDao.findPostsByTitle(childrenPost.getTitle());
+        if (checkChildrenPost.isPresent()) {
+            throw new Exception("A post with this title already exist " + checkChildrenPost.get().getTitle());
+        }
+        Optional<User> user = authenticationService.getCurrentUser();
+
+        childrenPost.setParent(parentPost.get());
+        childrenPost.setUser(user.get());
+        this.categoryDao.saveAll(childrenPost.getCategories());
+        this.tagDao.saveAll(childrenPost.getTags());
+
+        Post savedChildrenPost = this.postDao.save(childrenPost);
+
+        PostDTO returnDTO = postMapper.postToPostDTO(savedChildrenPost);
+
+        returnDTO.setAuthor(user.get().getSurname()+" "+user.get().getOtherNames());
+        returnDTO.setPostUrl(getPostUrl(savedChildrenPost.getId()));
+        returnDTO.setParentPostUrl(getPostUrl(parentPost.get().getId()));
+        returnDTO.setChildrenPostUrl(savedChildrenPost.getChildren()
+                .stream().map(
+                        post -> {
+                            return getPostUrl(post.getId());
+                        }
+                ).collect(Collectors.toList()));
+
+        return returnDTO;
+    }
+
+    @Override
     public List<PostDTO> getAllPostByUser() {
         Optional<User> user  = authenticationService.getCurrentUser();
         return this.postDao
@@ -51,6 +86,17 @@ public class PostServiceImpl implements PostService {
                             PostDTO postDTO = postMapper.postToPostDTO(post);
                             postDTO.setPostUrl(getPostUrl(post.getId()));
                             postDTO.setAuthor(user.get().getSurname()+" "+user.get().getOtherNames());
+                            if(post.getParent() != null){
+                                postDTO.setParentPostUrl(getPostUrl(post.getParent().getId()));
+                            }else{
+                                postDTO.setParentPostUrl("");
+                            }
+//                            postDTO.setParentPostUrl(getPostUrl(Optional.of(post.getParent().getId()).orElse(Long.valueOf("0"))));
+                            postDTO.setChildrenPostUrl(post.getChildren().stream().map(
+                                    post1 -> {
+                                        return getPostUrl(post1.getId());
+                                    }
+                            ).collect(Collectors.toList()));
                             return postDTO;
                         }
                 ).collect(Collectors.toList());
@@ -64,7 +110,17 @@ public class PostServiceImpl implements PostService {
                             PostDTO postDTO = postMapper.postToPostDTO(post);
                             postDTO.setPostUrl(getPostUrl(post.getId()));
                             postDTO.setAuthor(returnAuthorDetails(post.getUser().getId()));
-
+                            if(post.getParent() != null){
+                                postDTO.setParentPostUrl(getPostUrl(post.getParent().getId()));
+                            }else{
+                                postDTO.setParentPostUrl("");
+                            }
+//                            postDTO.setParentPostUrl(getPostUrl(Optional.of(post.getParent().getId()).orElse(Long.valueOf("0"))));
+                            postDTO.setChildrenPostUrl(post.getChildren().stream().map(
+                                    post1 -> {
+                                        return getPostUrl(post1.getId());
+                                    }
+                            ).collect(Collectors.toList()));
                             return postDTO;
                         }
                 ).collect(Collectors.toList());
@@ -77,10 +133,22 @@ public class PostServiceImpl implements PostService {
         if (post.isEmpty()) {
             throw new NotFoundException("Post Not Found. for ID value " + id);
         }
+
         return post.map(postMapper::postToPostDTO)
                 .map(postDTO -> {
                     postDTO.setPostUrl(getPostUrl(post.get().getId()));
                     postDTO.setAuthor(returnAuthorDetails(post.get().getUser().getId()));
+                    if(post.get().getParent() != null){
+                        postDTO.setParentPostUrl(getPostUrl(post.get().getParent().getId()));
+                    }else{
+                        postDTO.setParentPostUrl("");
+                    }
+//                    postDTO.setParentPostUrl(getPostUrl(Optional.of(post.get().getParent().getId()).orElse(Long.valueOf("0"))));
+                    postDTO.setChildrenPostUrl(post.get().getChildren().stream().map(
+                            post1 -> {
+                                return getPostUrl(post1.getId());
+                            }
+                    ).collect(Collectors.toList()));
                     return postDTO;
                 });
     }
@@ -99,7 +167,7 @@ public class PostServiceImpl implements PostService {
 
         Post savedPost = this.postDao.save(post);
 
-        PostDTO returnDTO = postMapper.postToPostDTO(post);
+        PostDTO returnDTO = postMapper.postToPostDTO(savedPost);
 
         returnDTO.setAuthor(user.get().getSurname()+" "+user.get().getOtherNames());
         returnDTO.setPostUrl(getPostUrl(savedPost.getId()));

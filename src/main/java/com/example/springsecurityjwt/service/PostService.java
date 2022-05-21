@@ -17,4 +17,6 @@ public interface PostService {
     PostDTO save(Post post) throws Exception;
 
     void delete(long id);
+
+    PostDTO quotePost(long parentId, Post post) throws Exception;
 }
