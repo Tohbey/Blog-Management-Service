@@ -4,10 +4,13 @@ import com.example.springsecurityjwt.api.v1.DTO.PostDTO;
 import com.example.springsecurityjwt.api.v1.DTO.UserDTO;
 import com.example.springsecurityjwt.api.v1.mapper.PostMapper;
 import com.example.springsecurityjwt.controller.PostController;
-import com.example.springsecurityjwt.controller.UserController;
+import com.example.springsecurityjwt.dao.CategoryDao;
 import com.example.springsecurityjwt.dao.PostDao;
+import com.example.springsecurityjwt.dao.TagDao;
 import com.example.springsecurityjwt.exceptions.NotFoundException;
+import com.example.springsecurityjwt.model.Category;
 import com.example.springsecurityjwt.model.Post;
+import com.example.springsecurityjwt.model.Tag;
 import com.example.springsecurityjwt.model.User;
 import com.example.springsecurityjwt.service.AuthenticationService;
 import com.example.springsecurityjwt.service.PostService;
@@ -21,15 +24,22 @@ import java.util.stream.Collectors;
 @Service
 public class PostServiceImpl implements PostService {
     private final PostDao postDao;
+    private final CategoryDao categoryDao;
+    private final TagDao tagDao;
     private final PostMapper postMapper;
     private final UserService userService;
     private final AuthenticationService authenticationService;
 
-    public PostServiceImpl(PostDao postDao, PostMapper postMapper, UserService userService, AuthenticationService authenticationService){
+    public PostServiceImpl(PostDao postDao, PostMapper postMapper
+            , UserService userService,
+                           AuthenticationService authenticationService,
+                           CategoryDao categoryDao, TagDao tagDao){
         this.postDao = postDao;
         this.postMapper = postMapper;
         this.userService = userService;
         this.authenticationService = authenticationService;
+        this.categoryDao = categoryDao;
+        this.tagDao = tagDao;
     }
 
     @Override
@@ -83,6 +93,9 @@ public class PostServiceImpl implements PostService {
         }
         Optional<User> user = authenticationService.getCurrentUser();
         post.setUser(user.get());
+
+        List<Category> categories = this.categoryDao.saveAll(post.getCategories());
+        List<Tag> tags = this.tagDao.saveAll(post.getTags());
 
         Post savedPost = this.postDao.save(post);
 

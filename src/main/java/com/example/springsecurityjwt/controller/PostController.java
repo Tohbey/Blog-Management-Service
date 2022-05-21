@@ -85,7 +85,7 @@ public class PostController {
         return ResponseEntity.ok().body(object);
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseEntity<ResponseObject> getPostById(@PathVariable long id){
         ResponseObject object = new ResponseObject();
         try {
